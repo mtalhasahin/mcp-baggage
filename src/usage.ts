@@ -66,13 +66,19 @@ export function callsInLine(line: string): string[] {
   return found;
 }
 
-/** Every `.jsonl` under a directory, one level of nesting or ten. */
+/**
+ * Every `.jsonl` under a directory, one level of nesting or ten.
+ *
+ * The directory a `Dirent` came from is `parentPath` on Node 20.12 and after,
+ * and was `path` before it. Both are read, because getting this wrong does not
+ * fail — it silently reads nothing and reports every tool as never called.
+ */
 async function transcripts(root: string): Promise<string[]> {
   try {
     const entries = await readdir(root, { recursive: true, withFileTypes: true });
     return entries
       .filter((e) => e.isFile() && e.name.endsWith('.jsonl'))
-      .map((e) => join(e.parentPath ?? root, e.name));
+      .map((e) => join(e.parentPath ?? (e as { path?: string }).path ?? root, e.name));
   } catch {
     return [];
   }
