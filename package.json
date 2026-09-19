@@ -1,0 +1,50 @@
+{
+  "name": "mcp-baggage",
+  "version": "0.1.0",
+  "description": "What each MCP server carries into your context window, and how much of it you actually use.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "context-window",
+    "tokens",
+    "claude-code",
+    "cursor",
+    "codex",
+    "cli"
+  ],
+  "homepage": "https://github.com/mtalhasahin/mcp-baggage#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mtalhasahin/mcp-baggage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mtalhasahin/mcp-baggage/issues"
+  },
+  "license": "MIT",
+  "author": "mtalhasahin",
+  "type": "module",
+  "bin": {
+    "mcp-baggage": "dist/bin.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.10"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "test": "node --test \"tests/*.test.ts\"",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
