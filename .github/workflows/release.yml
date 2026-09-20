@@ -27,7 +27,10 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
+          # Deliberately no registry-url: it makes setup-node write an .npmrc
+          # with a dummy NODE_AUTH_TOKEN, and npm that finds any credential
+          # configured never attempts the OIDC exchange — it sends the dummy
+          # one and the registry answers 404. No credential is the credential.
           # A release build has no business reusing anything it did not fetch.
           package-manager-cache: false
 
@@ -35,7 +38,9 @@ jobs:
       # newer already, and pinning the floor is cheaper than finding out it
       # was not on the day a release matters.
       - name: npm new enough to publish by identity
-        run: npm install -g npm@latest
+        run: |
+          npm install -g npm@latest
+          npm --version
 
       - run: npm ci
 
