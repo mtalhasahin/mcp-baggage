@@ -1,5 +1,8 @@
 # Baggage
 
+[![npm](https://img.shields.io/npm/v/mcp-baggage)](https://www.npmjs.com/package/mcp-baggage)
+[![ci](https://github.com/mtalhasahin/mcp-baggage/actions/workflows/ci.yml/badge.svg)](https://github.com/mtalhasahin/mcp-baggage/actions/workflows/ci.yml)
+
 **What each MCP server carries into your context window, and how much of it you actually use.**
 
 Installing an MCP server is free. Keeping one is not. Every tool a server declares is sent to the
