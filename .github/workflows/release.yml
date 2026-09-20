@@ -42,6 +42,18 @@ jobs:
           npm install -g npm@latest
           npm --version
 
+      # The two things the OIDC exchange needs before it can even start. When
+      # a publish fails with ENEEDAUTH this says in one line whether GitHub
+      # offered an identity or npm declined to ask for one.
+      - name: is there an identity to publish with
+        run: |
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "id-token endpoint: offered"
+          else
+            echo "id-token endpoint: MISSING — the job has no id-token: write"
+          fi
+          npm config get registry
+
       - run: npm ci
 
       - run: npm run check
