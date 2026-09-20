@@ -1,6 +1,6 @@
 {
   "name": "mcp-baggage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "What each MCP server carries into your context window, and how much of it you actually use.",
   "keywords": [
     "mcp",
