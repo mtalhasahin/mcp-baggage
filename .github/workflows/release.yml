@@ -1,0 +1,61 @@
+name: release
+
+# Publishing is a tag away, and nothing but a tag: no token lives in this
+# repository, in an environment secret or on anyone's laptop. GitHub proves to
+# npm which workflow, in which repository, at which commit is asking, and npm
+# accepts that or accepts nothing — which is what the trusted publisher entry
+# on npmjs.com says. It also means every published version came from a clean
+# checkout that passed its tests, rather than from whatever was on a disk.
+on:
+  push:
+    tags: ['v*']
+  # Left here for a re-run after a failed publish, without moving the tag.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # The one that matters: without it there is no OIDC token and no publish.
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          # A release build has no business reusing anything it did not fetch.
+          package-manager-cache: false
+
+      # Trusted publishing needs 11.5.1 or later; the runner's npm is usually
+      # newer already, and pinning the floor is cheaper than finding out it
+      # was not on the day a release matters.
+      - name: npm new enough to publish by identity
+        run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+
+      - name: the tag must be the version being published
+        # Only a tag can disagree with package.json; a manual re-run is
+        # deliberate and has no tag to check against.
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tagged="${GITHUB_REF_NAME#v}"
+          packaged=$(node -p "require('./package.json').version")
+          if [ "$tagged" != "$packaged" ]; then
+            echo "tag says $tagged, package.json says $packaged" >&2
+            exit 1
+          fi
+
+      # No token, and no --provenance flag: with a trusted publisher npm signs
+      # the provenance attestation itself, so the package page can say which
+      # commit and which workflow built it.
+      - run: npm publish --access public
