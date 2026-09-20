@@ -10,6 +10,7 @@
  * servers start up.
  */
 
+import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 
 import { discover } from './config.ts';
@@ -20,7 +21,18 @@ import { DEFAULT_DAYS, lookup, readUsage } from './usage.ts';
 import { heaviestFirst, weigh } from './weigh.ts';
 import type { Inventory } from './types.ts';
 
-const VERSION = '0.1.0';
+/**
+ * The version, read from the manifest rather than written down twice.
+ *
+ * It was a constant here until a release proved why that is a bad idea:
+ * `npm version` bumps package.json and nothing else, so a published 0.1.1
+ * would introduce itself as 0.1.0. One copy, read at startup — from
+ * ../package.json, which is the manifest whether this file is running from
+ * src/ or from the published dist/.
+ */
+const VERSION = (
+  JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string }
+).version;
 
 const HELP = `mcp-baggage ${VERSION}
 

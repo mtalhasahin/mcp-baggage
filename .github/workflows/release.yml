@@ -60,6 +60,18 @@ jobs:
       - run: npm test
       - run: npm run build
 
+      - name: the built command must report the version being published
+        # It said 0.1.0 while publishing 0.1.1 once, because the number lived
+        # in two places. It lives in one now, and this makes sure the built
+        # artifact can still find it from wherever it ends up.
+        run: |
+          built=$(node dist/bin.js --version)
+          packaged=$(node -p "require('./package.json').version")
+          if [ "$built" != "$packaged" ]; then
+            echo "the command says $built, package.json says $packaged" >&2
+            exit 1
+          fi
+
       - name: the tag must be the version being published
         # Only a tag can disagree with package.json; a manual re-run is
         # deliberate and has no tag to check against.
